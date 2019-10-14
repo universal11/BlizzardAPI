@@ -1,0 +1,34 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using Newtonsoft.Json.Linq;
+
+namespace BlizzardAPI
+{
+    public class BlizzardAPIClient
+    {
+        public string clientId{get;set;}
+        public string secretKey{get;set;}
+        public string accessToken{get;set;}
+
+        public BlizzardAPIClient(string clientId, string secretKey){
+            this.clientId = clientId;
+            this.secretKey = secretKey;
+        }
+
+        public string GetAccessToken(){
+            Dictionary<string, string> values = new Dictionary<string, string>{
+                { "grant_type", "client_credentials" }
+            };
+            FormUrlEncodedContent data = new FormUrlEncodedContent(values);
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.clientId}:{this.secretKey}")) );
+            HttpResponseMessage response = client.PostAsync("https://us.battle.net/oauth/token", data).Result;
+            return JObject.Parse(response.Content.ReadAsStringAsync().Result)["access_token"].ToString();
+
+        }
+
+    }
+}
