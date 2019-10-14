@@ -3,6 +3,9 @@
 namespace BlizzardAPI
 {
     public class Token
-    {
+    { 
+        public Token(){
+
+        }
     }
 }
