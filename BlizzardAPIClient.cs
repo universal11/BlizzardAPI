@@ -15,11 +15,14 @@ namespace BlizzardAPI
         public Locale locale{get;set;}
 
         public BlizzardAPIClient(string clientId, string secretKey, string localeCode){
+            this.Init(clientId, secretKey, localeCode);
+        }
+
+        public void Init(string clientId, string secretKey, string localeCode){
             this.clientId = clientId;
             this.secretKey = secretKey;
             this.locale = Locale.GetByCode(localeCode);
         }
-
 
         public string GetAccessToken(){
             Dictionary<string, string> values = new Dictionary<string, string>{
@@ -33,18 +36,7 @@ namespace BlizzardAPI
 
         }
         
-        public List<Realm> GetRealms(){
-            List<Realm> realms = new List<Realm>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}wow/realm/status?locale={this.locale.code}&access_token={this.accessToken}").Result;
-            foreach(var result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["realms"].Children()){
-                Realm realm = result.ToObject<Realm>();
-                realms.Add(realm);
-            }
-            return realms;
-        }
+        
 
     }
 }
