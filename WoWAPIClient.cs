@@ -16,11 +16,34 @@ namespace BlizzardAPI{
             HttpClient client = new HttpClient();
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}wow/realm/status?locale={this.locale.code}&access_token={this.accessToken}").Result;
-            foreach(var result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["realms"].Children()){
-                Realm realm = result.ToObject<Realm>();
-                realms.Add(realm);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/connected-realm/index?namespace=dynamic-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["connected_realms"].Children()){
+                realms.AddRange(this.GetConnectedRealms(result.GetValue("href").ToString())); //result.ToObject<Realm>();
+                //realms.Add(realm);
             }
+            return realms;
+        }
+        
+        private List<Realm> GetConnectedRealms(string realmURL){
+            List<Realm> realms = new List<Realm>();
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{realmURL}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            foreach(JObject result in data["realms"].Children()){
+
+                Realm realm = new Realm();
+                realm.name = result["name"].ToString();
+                realm.hasQueue = (bool)data["has_queue"];
+                realm.isTournament = (bool)result["is_tournament"];
+                realm.type = result["type"]["name"].ToString();
+                realm.slug = result["slug"].ToString();
+                realms.Add(realm);
+
+                
+            }
+            
             return realms;
         }
 
