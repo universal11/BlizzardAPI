@@ -18,8 +18,7 @@ namespace BlizzardAPI{
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
             HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/connected-realm/index?namespace=dynamic-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["connected_realms"].Children()){
-                realms.AddRange(this.GetConnectedRealms(result.GetValue("href").ToString())); //result.ToObject<Realm>();
-                //realms.Add(realm);
+                realms.AddRange(this.GetConnectedRealms(result.GetValue("href").ToString()));
             }
             return realms;
         }
@@ -47,12 +46,41 @@ namespace BlizzardAPI{
             return realms;
         }
 
+        private Race GetRace(string raceURL){
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{raceURL}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            Race race = new Race();
+            race.id = Convert.ToInt32(data["id"]);
+            race.name = data["name"].ToString();
+            race.faction = data["faction"]["name"].ToString();
+            race.isSelectable = (bool)data["is_selectable"];
+            race.isAlliedRace = (bool)data["is_allied_race"];
+            return race;
+        }
+
         public List<Race> GetRaces(){
             List<Race> races = new List<Race>();
             HttpClient client = new HttpClient();
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}wow/data/character/races?locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/playable-race/index?namespace=static-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["races"].Children()){
+                races.Add(this.GetRace(result["key"]["href"].ToString()));
+            }
+            return races;
+        }
+
+        /*
+        public List<Race> GetRaces(){
+            List<Race> races = new List<Race>();
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/playable-race/index?namespace=static-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
             //races = JsonConvert.DeserializeObject<List<Race>>(response.Content.ReadAsStringAsync().Result);
             
             foreach(var result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["races"].Children()){
@@ -62,5 +90,6 @@ namespace BlizzardAPI{
             
             return races;
         }
+        */
     }
 }
