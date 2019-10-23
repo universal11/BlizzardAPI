@@ -24,6 +24,10 @@ namespace BlizzardAPI
             this.locale = Locale.GetByCode(localeCode);
         }
 
+        public void Authenticate(){
+            this.accessToken = this.GetAccessToken();
+        }
+
         public string GetAccessToken(){
             Dictionary<string, string> values = new Dictionary<string, string>{
                 { "grant_type", "client_credentials" }

@@ -33,11 +33,15 @@ namespace BlizzardAPI{
             foreach(JObject result in data["realms"].Children()){
 
                 Realm realm = new Realm();
+                realm.id = Convert.ToInt32(result["id"]);
                 realm.name = result["name"].ToString();
                 realm.hasQueue = (bool)data["has_queue"];
                 realm.isTournament = (bool)result["is_tournament"];
                 realm.type = result["type"]["name"].ToString();
+                realm.population = data["population"]["name"].ToString();
+                realm.status = data["status"]["name"].ToString();
                 realm.slug = result["slug"].ToString();
+                realm.timezone = result["timezone"].ToString();
                 realms.Add(realm);
 
                 
