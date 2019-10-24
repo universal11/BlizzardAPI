@@ -11,6 +11,73 @@ namespace BlizzardAPI{
             
         }
 
+        private DateTime UnixTimeStampToDateTime( double timeStamp ){
+            DateTime dateTime = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
+            dateTime = dateTime.AddMilliseconds( timeStamp ).ToLocalTime();
+            return dateTime;
+        }
+
+        public List<Dungeon> GetDungeons(){
+            List<Dungeon> dungeons = new List<Dungeon>();
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/dungeon/index?namespace=dynamic-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["dungeons"].Children()){
+                dungeons.Add(this.GetDungeon(Convert.ToInt32(result["id"])));
+            }
+            return dungeons;
+        }
+        public Dungeon GetDungeon(int dungeonId){
+            Dungeon dungeon = null;
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/dungeon/{dungeonId}?namespace=dynamic-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            JObject result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            if(result != null){
+                dungeon = new Dungeon();
+                dungeon.id = Convert.ToInt32(result["id"]);
+                dungeon.name = result["name"].ToString();
+            }
+            return dungeon;
+        }
+        public List<MythicSeason> GetMythicSeasons(){
+            List<MythicSeason> seasons = new List<MythicSeason>();
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/season/index?namespace=dynamic-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["seasons"].Children()){
+                string period = result["id"].ToString();
+                System.Console.WriteLine($"Period ID: {period}");
+                int mythicSeasonId = Convert.ToInt32(result["id"]);
+                if(mythicSeasonId > 0){
+                    seasons.Add(this.GetMythicSeason(mythicSeasonId));
+                }
+                
+            }
+            return seasons;
+        }
+
+        public MythicSeason GetMythicSeason(int mythicSeasonId){
+            MythicSeason season = null;
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/season/{mythicSeasonId}?namespace=dynamic-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            JObject result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            if(result != null){
+                season = new MythicSeason();
+                season.id = Convert.ToInt32(result["id"]);
+                season.startDate = this.UnixTimeStampToDateTime(Convert.ToDouble(result["start_timestamp"]));
+                season.endDate = ( (result["end_timestamp"] != null) ? this.UnixTimeStampToDateTime(Convert.ToDouble(result["end_timestamp"])) : (DateTime?)null );
+            }
+            return season;
+        }
+
+
+
         public List<Realm> GetRealms(){
             List<Realm> realms = new List<Realm>();
             HttpClient client = new HttpClient();

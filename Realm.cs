@@ -28,5 +28,6 @@ namespace BlizzardAPI{
             this.battlegroup = battlegroup;
             this.timezone = timezone;
         }
+        
     }
 }
