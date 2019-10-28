@@ -145,6 +145,24 @@ namespace BlizzardAPI{
             return races;
         }
 
+        public Character GetCharacterProfile(string realmSlug, string name){
+            name = name.ToLower();
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}profile/wow/character/{realmSlug}/{name}?namespace=profile-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            if(response.StatusCode != System.Net.HttpStatusCode.OK){
+                return null;
+            }
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            Character character = new Character();
+            character.id = Convert.ToInt32(data["id"]);
+            character.name = data["name"].ToString();
+            character.realmId = Convert.ToInt32(data["realm"]["id"]);
+            return character;
+        }
+
         /*
         public List<Race> GetRaces(){
             List<Race> races = new List<Race>();
