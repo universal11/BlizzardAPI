@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using BlizzardAPI.WoW;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -144,6 +145,7 @@ namespace BlizzardAPI{
             }
             return races;
         }
+        
 
         public Character GetCharacterProfile(string realmSlug, string name){
             name = name.ToLower();
@@ -180,5 +182,33 @@ namespace BlizzardAPI{
             return races;
         }
         */
+
+
+        public List<Pet> GetPets(){
+            List<Pet> pets = new List<Pet>();
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/pet/index?namespace=static-us&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["pets"].Children()){
+                pets.Add( this.GetPetById(Convert.ToInt32(result["id"])) );
+            }
+            return pets;
+        }
+
+        private Pet GetPetById(int id){
+            HttpClient client = new HttpClient();
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            //System.Console.WriteLine($"GetPetByID | {this.locale.host}data/wow/pet/{id}?namespace=static-{locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/pet/{id}?namespace=static-{locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            
+
+            Pet pet = new Pet();
+            pet.id = Convert.ToInt32(data["id"]);
+            pet.name = data["name"].ToString();
+            return pet;
+        }
     }
 }
