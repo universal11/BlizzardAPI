@@ -1,6 +1,6 @@
 using System;
 
-namespace BlizzardAPI{
+namespace BlizzardAPI.WoW{
     public class Realm{
         public int id{get;set;}
         public string type{get;set;}

@@ -1,6 +1,6 @@
 using System;
 
-namespace BlizzardAPI{
+namespace BlizzardAPI.WoW{
     public class Race{
         public int id{get;set;}
         public string name{get;set;}

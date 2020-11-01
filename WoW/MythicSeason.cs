@@ -1,6 +1,6 @@
 using System;
 
-namespace BlizzardAPI{
+namespace BlizzardAPI.WoW{
     public class MythicSeason{
         public int id{get;set;}
         public DateTime startDate{get;set;}

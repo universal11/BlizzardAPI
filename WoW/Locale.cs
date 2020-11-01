@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BlizzardAPI{
+namespace BlizzardAPI.WoW{
     public class Locale{
         public string code{get;set;}
         public string region{get;set;}

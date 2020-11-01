@@ -7,14 +7,15 @@ using Newtonsoft.Json.Linq;
 
 namespace BlizzardAPI
 {
-    public class BlizzardAPIClient
+    public class Client
     {
         public string clientId{get;set;}
         public string secretKey{get;set;}
         public string accessToken{get;set;}
-        public Locale locale{get;set;}
+        //public Locale locale{get;set;}
 
-        public BlizzardAPIClient(string clientId, string secretKey, string localeCode){
+        /*
+        public Client(string clientId, string secretKey, string localeCode){
             this.Init(clientId, secretKey, localeCode);
         }
 
@@ -22,6 +23,20 @@ namespace BlizzardAPI
             this.clientId = clientId;
             this.secretKey = secretKey;
             this.locale = Locale.GetByCode(localeCode);
+        }
+        */
+
+        public Client(){
+            
+        }
+
+        public Client(string clientId, string secretKey){
+            this.Init(clientId, secretKey);
+        }
+
+        public void Init(string clientId, string secretKey){
+            this.clientId = clientId;
+            this.secretKey = secretKey;
         }
 
         public void Authenticate(){
