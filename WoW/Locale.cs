@@ -11,13 +11,6 @@ namespace BlizzardAPI.WoW{
 
         }
 
-        public void Init(string code, string region, string name, string host){
-            this.code = code;
-            this.region = region;
-            this.name = name;
-            this.host = host;
-        }
-
         public static Locale GetByCode(string code){
             foreach(Locale locale in Locale.GetAll()){
                 if(locale.code == code){

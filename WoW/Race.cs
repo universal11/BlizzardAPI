@@ -11,14 +11,6 @@ namespace BlizzardAPI.WoW{
 
         }
 
-        public void Init(int id, string name, string faction, bool isSelectable, bool isAlliedRace){
-            this.id = id;
-            this.name = name;
-            this.faction = faction;
-            this.isSelectable = isSelectable;
-            this.isAlliedRace = isAlliedRace;
-        }
-
         
     }
 }

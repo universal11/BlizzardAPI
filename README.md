@@ -12,7 +12,7 @@ client.Authenticate();
 
 ### Get Races ###
 ```
-WoWAPIClient client = new WoWAPIClient(clientID, secretKey, locale);
+BlizzardAPI.WoW.Client client = new BlizzardAPI.WoW.Client(clientID, secretKey, locale);
 client.Authenticate();
 List<Race> races = client.GetRaces();
 ```
@@ -20,22 +20,28 @@ List<Race> races = client.GetRaces();
 
 ### Get Realms ###
 ```
-WoWAPIClient client = new WoWAPIClient(clientID, secretKey, locale);
+BlizzardAPI.WoW.Client client = new BlizzardAPI.WoW.Client(clientID, secretKey, locale);
 client.Authenticate();
 List<Realm> realms = client.GetRealms();
 ```
 
 ### Get Dungeons ###
 ```
-WoWAPIClient client = new WoWAPIClient(clientID, secretKey, locale);
+BlizzardAPI.WoW.Client client = new BlizzardAPI.WoW.Client(clientID, secretKey, locale);
 client.Authenticate();
 List<Dungeon> dungeons = client.GetDungeons();
 ```
+
 ### Get Mythic Seasons ###
 ```
-WoWAPIClient client = new WoWAPIClient(clientID, secretKey, locale);
+BlizzardAPI.WoW.Client client = new BlizzardAPI.WoW.Client(clientID, secretKey, locale);
 client.Authenticate();
 List<MythicSeason> seasons = client.GetMythicSeasons();
 ```
 
-
+### Get Pets ###
+```
+BlizzardAPI.WoW.Client client = new BlizzardAPI.WoW.Client(clientID, secretKey, locale);
+client.Authenticate();
+List<Pet> pets = client.GetPets();
+```

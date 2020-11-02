@@ -8,12 +8,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BlizzardAPI.WoW{
     public class Client : BlizzardAPI.Client{
-
-        /*
-        public Client(string clientId, string secretKey, string localeCode) : base(clientId, secretKey, localeCode ){
-            
-        }
-        */
         public Locale locale{get;set;}
 
         public Client(){
@@ -37,10 +31,7 @@ namespace BlizzardAPI.WoW{
 
         public List<Dungeon> GetDungeons(){
             List<Dungeon> dungeons = new List<Dungeon>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/dungeon/index?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/mythic-keystone/dungeon/index?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["dungeons"].Children()){
                 dungeons.Add(this.GetDungeon(Convert.ToInt32(result["id"])));
             }
@@ -48,10 +39,7 @@ namespace BlizzardAPI.WoW{
         }
         public Dungeon GetDungeon(int dungeonId){
             Dungeon dungeon = null;
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/dungeon/{dungeonId}?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/mythic-keystone/dungeon/{dungeonId}?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             JObject result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             if(result != null){
                 dungeon = new Dungeon();
@@ -62,10 +50,7 @@ namespace BlizzardAPI.WoW{
         }
         public List<MythicSeason> GetMythicSeasons(){
             List<MythicSeason> seasons = new List<MythicSeason>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/season/index?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/mythic-keystone/season/index?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["seasons"].Children()){
                 string period = result["id"].ToString();
                 System.Console.WriteLine($"Period ID: {period}");
@@ -80,10 +65,7 @@ namespace BlizzardAPI.WoW{
 
         public MythicSeason GetMythicSeason(int mythicSeasonId){
             MythicSeason season = null;
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/mythic-keystone/season/{mythicSeasonId}?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/mythic-keystone/season/{mythicSeasonId}?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             JObject result = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             if(result != null){
                 season = new MythicSeason();
@@ -98,10 +80,7 @@ namespace BlizzardAPI.WoW{
 
         public List<Realm> GetRealms(){
             List<Realm> realms = new List<Realm>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/connected-realm/index?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/connected-realm/index?namespace=dynamic-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["connected_realms"].Children()){
                 realms.AddRange(this.GetConnectedRealms(result.GetValue("href").ToString()));
             }
@@ -110,10 +89,7 @@ namespace BlizzardAPI.WoW{
         
         private List<Realm> GetConnectedRealms(string realmURL){
             List<Realm> realms = new List<Realm>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{realmURL}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{realmURL}&locale={this.locale.code}&access_token={this.accessToken}");
             JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             foreach(JObject result in data["realms"].Children()){
 
@@ -136,10 +112,7 @@ namespace BlizzardAPI.WoW{
         }
 
         private Race GetRace(string raceURL){
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{raceURL}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{raceURL}&locale={this.locale.code}&access_token={this.accessToken}");
             JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
             Race race = new Race();
@@ -153,10 +126,7 @@ namespace BlizzardAPI.WoW{
 
         public List<Race> GetRaces(){
             List<Race> races = new List<Race>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/playable-race/index?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/playable-race/index?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["races"].Children()){
                 races.Add(this.GetRace(result["key"]["href"].ToString()));
             }
@@ -166,10 +136,7 @@ namespace BlizzardAPI.WoW{
 
         public Character GetCharacterProfile(string realmSlug, string name){
             name = name.ToLower();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}profile/wow/character/{realmSlug}/{name}?namespace=profile-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}profile/wow/character/{realmSlug}/{name}?namespace=profile-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             if(response.StatusCode != System.Net.HttpStatusCode.OK){
                 return null;
             }
@@ -203,29 +170,80 @@ namespace BlizzardAPI.WoW{
 
         public List<Pet> GetPets(){
             List<Pet> pets = new List<Pet>();
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/pet/index?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/pet/index?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["pets"].Children()){
                 pets.Add( this.GetPetById(Convert.ToInt32(result["id"])) );
             }
             return pets;
         }
 
-        private Pet GetPetById(int id){
-            HttpClient client = new HttpClient();
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            //System.Console.WriteLine($"GetPetByID | {this.locale.host}data/wow/pet/{id}?namespace=static-{locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
-            HttpResponseMessage response = client.GetAsync($"{this.locale.host}data/wow/pet/{id}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}").Result;
+        public Pet GetPetById(int id){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/pet/{id}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-            
-
             Pet pet = new Pet();
             pet.id = Convert.ToInt32(data["id"]);
             pet.name = data["name"].ToString();
+            pet.description = data["description"].ToString();
+
+            PetType type = new PetType();
+            type.id = Convert.ToInt32(data["battle_pet_type"]["id"].ToString());
+            type.type = data["battle_pet_type"]["type"].ToString();
+            type.name = data["battle_pet_type"]["name"].ToString();
+            pet.type = type;
+
+            pet.isCapturable = (bool)data["is_capturable"];
+            pet.isTradable = (bool)data["is_tradable"];
+            pet.isBattlePet = (bool)data["is_battlepet"];
+            pet.isAllianceOnly = (bool)data["is_alliance_only"];
+            pet.isHordeOnly = (bool)data["is_horde_only"];
+
+            if( data["abilities"] != null){
+                foreach(JObject _ability in data["abilities"].Children() ){
+                    PetAbility ability = this.GetPetAbilityById(Convert.ToInt32(_ability["ability"]["id"].ToString()));
+                    ability.slot = Convert.ToInt32(_ability["slot"].ToString());
+                    ability.requiredLevel = Convert.ToInt32(_ability["required_level"].ToString());
+                    ability.assets = this.GetPetAbilityMediaAssetsByPetAbilityId(ability.id);
+                    pet.abilities.Add(ability);
+                }
+            }
+            
+
+
             return pet;
+        }
+
+        public PetAbility GetPetAbilityById(int id){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/pet-ability/{id}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+            PetAbility ability = new PetAbility();
+            ability.id = Convert.ToInt32(data["id"].ToString());
+            ability.name = data["name"].ToString();
+
+            PetType type = new PetType();
+            type.id = Convert.ToInt32(data["battle_pet_type"]["id"].ToString());
+            type.type = data["battle_pet_type"]["type"].ToString();
+            type.name = data["battle_pet_type"]["name"].ToString();
+            ability.type = type;
+            ability.rounds = Convert.ToInt32(data["rounds"].ToString());
+
+            return ability;
+        }
+
+        public List<PetAbilityMediaAsset> GetPetAbilityMediaAssetsByPetAbilityId(int petAbilityId){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/media/pet-ability/{petAbilityId}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            List<PetAbilityMediaAsset> assets = new List<PetAbilityMediaAsset>();
+
+            foreach(JObject _asset in data["assets"].Children()){
+                PetAbilityMediaAsset asset = new PetAbilityMediaAsset();
+                asset.petAbilityId = Convert.ToInt32( data["id"].ToString() );
+                asset.key = _asset["key"].ToString();
+                asset.value = _asset["value"].ToString();
+                asset.fileDataId = Convert.ToInt32( _asset["file_data_id"].ToString() );
+            }
+
+            return assets;
         }
     }
 }

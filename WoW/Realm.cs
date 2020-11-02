@@ -16,18 +16,6 @@ namespace BlizzardAPI.WoW{
         public Realm(){
 
         }
-
-        public void Init(int id, string type, string population, bool hasQueue, string name, string slug, string battlegroup, string timezone, string status){
-            this.id = id;
-            this.type = type;
-            this.population = population;
-            this.hasQueue = hasQueue;
-            this.name = name;
-            this.slug = slug;
-            this.status = status;
-            this.battlegroup = battlegroup;
-            this.timezone = timezone;
-        }
         
     }
 }

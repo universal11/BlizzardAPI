@@ -12,6 +12,7 @@ namespace BlizzardAPI
         public string clientId{get;set;}
         public string secretKey{get;set;}
         public string accessToken{get;set;}
+        public bool enableDebugMode {get;set;} = false;
         //public Locale locale{get;set;}
 
         /*
@@ -51,8 +52,21 @@ namespace BlizzardAPI
             HttpClient client = new HttpClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.clientId}:{this.secretKey}")) );
             HttpResponseMessage response = client.PostAsync("https://us.battle.net/oauth/token", data).Result;
-            return JObject.Parse(response.Content.ReadAsStringAsync().Result)["access_token"].ToString();
+            string accessToken = JObject.Parse(response.Content.ReadAsStringAsync().Result)["access_token"].ToString();
+            client.Dispose();
+            return accessToken;
 
+        }
+
+        public HttpResponseMessage HttpGetWithAuth(string url){
+            if(this.enableDebugMode){
+                System.Console.WriteLine($"GET: {url}");
+            }
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = client.GetAsync(url).Result;
+            client.Dispose();
+            return response;
         }
         
         
