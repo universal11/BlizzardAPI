@@ -13,6 +13,11 @@ namespace BlizzardAPI
         public string secretKey{get;set;}
         public string accessToken{get;set;}
         public bool enableDebugMode {get;set;} = false;
+        private int requestDelayInSeconds {get;set;} = 1;
+        private int requestLimit {get;set;} = 30;
+        private int requestCounter {get;set;} = 0;
+        private HttpClient httpClient = new HttpClient();
+
         //public Locale locale{get;set;}
 
         /*
@@ -49,25 +54,40 @@ namespace BlizzardAPI
                 { "grant_type", "client_credentials" }
             };
             FormUrlEncodedContent data = new FormUrlEncodedContent(values);
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.clientId}:{this.secretKey}")) );
-            HttpResponseMessage response = client.PostAsync("https://us.battle.net/oauth/token", data).Result;
+            //HttpClient client = new HttpClient();
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.clientId}:{this.secretKey}")) );
+            HttpResponseMessage response = this.httpClient.PostAsync("https://us.battle.net/oauth/token", data).Result;
             string accessToken = JObject.Parse(response.Content.ReadAsStringAsync().Result)["access_token"].ToString();
-            client.Dispose();
+            //client.Dispose();
             return accessToken;
 
         }
 
         public HttpResponseMessage HttpGetWithAuth(string url){
+            if(this.requestCounter == this.requestLimit){
+                System.Threading.Thread.Sleep(this.requestDelayInSeconds * 1000);
+                this.requestCounter = 0;
+            }
             if(this.enableDebugMode){
                 System.Console.WriteLine($"GET: {url}");
             }
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
-            HttpResponseMessage response = client.GetAsync(url).Result;
-            client.Dispose();
+            //HttpClient client = new HttpClient();
+            this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.accessToken);
+            HttpResponseMessage response = this.httpClient.GetAsync(url).Result;
+            if(!response.IsSuccessStatusCode){
+                System.Console.WriteLine($"Error Code: {response.StatusCode} | {response.Content.ReadAsStringAsync().Result}");
+                return null;
+            }
+            this.requestCounter++;
+            /*
+            if(this.enableDebugMode){
+                System.Console.WriteLine($"Response: {response.Content.ReadAsStringAsync().Result}");
+            }
+            */
+            //client.Dispose();
             return response;
         }
+        
         
         
 
