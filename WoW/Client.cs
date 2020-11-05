@@ -8,19 +8,9 @@ using Newtonsoft.Json.Linq;
 
 namespace BlizzardAPI.WoW{
     public class Client : BlizzardAPI.Client{
-        public Locale locale{get;set;}
-
-        public Client(){
-
-        }
-        public Client(string clientId, string secretKey, string localeCode){
+        
+        public Client(string clientId, string secretKey, string localeCode) : base(clientId, secretKey, localeCode){
             this.Init(clientId, secretKey, localeCode);
-        }
-
-        public void Init(string clientId, string secretKey, string localeCode){
-            this.clientId = clientId;
-            this.secretKey = secretKey;
-            this.locale = Locale.GetByCode(localeCode);
         }
 
         private DateTime UnixTimeStampToDateTime( double timeStamp ){
@@ -169,10 +159,18 @@ namespace BlizzardAPI.WoW{
 
 
         public List<Pet> GetPets(){
+            //int i = 0;
             List<Pet> pets = new List<Pet>();
             HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/pet/index?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             foreach(JObject result in JObject.Parse(response.Content.ReadAsStringAsync().Result)["pets"].Children()){
+                /*
+                if(i == 10){
+                    continue;
+                }
+                */
                 pets.Add( this.GetPetById(Convert.ToInt32(result["id"])) );
+                //i++;
+                
             }
             return pets;
         }
@@ -186,7 +184,7 @@ namespace BlizzardAPI.WoW{
             pet.description = data["description"].ToString();
 
             PetType type = new PetType();
-            type.id = Convert.ToInt32(data["battle_pet_type"]["id"].ToString());
+            type.id = Convert.ToInt32(data["battle_pet_type"]["id"]);
             type.type = data["battle_pet_type"]["type"].ToString();
             type.name = data["battle_pet_type"]["name"].ToString();
             pet.type = type;
@@ -199,32 +197,114 @@ namespace BlizzardAPI.WoW{
 
             if( data["abilities"] != null){
                 foreach(JObject _ability in data["abilities"].Children() ){
-                    PetAbility ability = this.GetPetAbilityById(Convert.ToInt32(_ability["ability"]["id"].ToString()));
-                    ability.slot = Convert.ToInt32(_ability["slot"].ToString());
-                    ability.requiredLevel = Convert.ToInt32(_ability["required_level"].ToString());
-                    ability.assets = this.GetPetAbilityMediaAssetsByPetAbilityId(ability.id);
+                    PetAbility ability = this.GetPetAbilityById(Convert.ToInt32(_ability["ability"]["id"]));
+                    ability.slot = Convert.ToInt32(_ability["slot"]);
+                    ability.requiredLevel = Convert.ToInt32(_ability["required_level"]);
                     pet.abilities.Add(ability);
                 }
             }
             
+            if( data["source"] != null){
+                PetSource source = new PetSource();
+                source.name = data["source"]["name"].ToString();
+                source.type = data["source"]["type"].ToString();
+                pet.source = source;
+            }
+            
+            pet.icon = data["icon"].ToString();
 
+            Creature creature = this.GetCreatureById( Convert.ToInt32(data["creature"]["id"]) );
+            pet.creature = creature;
+
+            pet.isRandomCreatureDisplay = (bool)data["is_random_creature_display"];
+
+            pet.media = new PetMedia();
+            pet.media.petId = pet.id;
+            pet.media.assets = this.GetPetMediaAssetsByPetId(pet.id);
 
             return pet;
+        }
+
+        public List<PetMediaAsset> GetPetMediaAssetsByPetId(int petId){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/media/pet/{petId}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            List<PetMediaAsset> assets = new List<PetMediaAsset>();
+            if(data["assets"] != null){
+                foreach(JObject _asset in data["assets"].Children()){
+                    PetMediaAsset asset = new PetMediaAsset();
+                    asset.petId = Convert.ToInt32( data["id"] );
+                    asset.key = _asset["key"].ToString();
+                    asset.value = _asset["value"].ToString();
+                    asset.fileDataId = Convert.ToInt32( _asset["file_data_id"] );
+                    assets.Add(asset);
+                }
+            }
+            return assets;
+        }
+
+        public Creature GetCreatureById(int id){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/creature/{id}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            Creature creature = new Creature();
+            creature.id = Convert.ToInt32(data["id"]);
+            creature.name = data["name"].ToString();
+            creature.type = this.GetCreatureTypeById( Convert.ToInt32(data["type"]["id"]) );
+            creature.isTameable = (bool)data["is_tameable"];
+            foreach(JObject record in data["creature_displays"].Children()){
+                CreatureDisplay display = new CreatureDisplay();
+                display.id = Convert.ToInt32( record["id"] );
+                display.assets = this.GetCreatureDisplayMediaAssetsByCreatureDisplayId(display.id);
+                creature.displays.Add(display);
+            }
+            return creature;
+        }
+
+        public CreatureType GetCreatureTypeById(int id){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/creature-type/{id}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            CreatureType creatureType = new CreatureType();
+            creatureType.id = Convert.ToInt32(data["id"]);
+            creatureType.name = data["name"].ToString();
+            return creatureType;
+        }
+
+        public List<CreatureDisplayMediaAsset> GetCreatureDisplayMediaAssetsByCreatureDisplayId(int creatureDisplayId){
+            HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/media/creature-display/{creatureDisplayId}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
+            JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
+
+            List<CreatureDisplayMediaAsset> assets = new List<CreatureDisplayMediaAsset>();
+            foreach(JObject _asset in data["assets"].Children()){
+                CreatureDisplayMediaAsset asset = new CreatureDisplayMediaAsset();
+                asset.creatureDisplayId = Convert.ToInt32( data["id"] );
+                asset.key = _asset["key"].ToString();
+                asset.value = _asset["value"].ToString();
+                assets.Add(asset);
+            }
+
+            return assets;
         }
 
         public PetAbility GetPetAbilityById(int id){
             HttpResponseMessage response = this.HttpGetWithAuth($"{this.locale.host}data/wow/pet-ability/{id}?namespace=static-{this.locale.region}&locale={this.locale.code}&access_token={this.accessToken}");
             JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
             PetAbility ability = new PetAbility();
-            ability.id = Convert.ToInt32(data["id"].ToString());
+            ability.id = Convert.ToInt32(data["id"]);
             ability.name = data["name"].ToString();
 
             PetType type = new PetType();
-            type.id = Convert.ToInt32(data["battle_pet_type"]["id"].ToString());
+            type.id = Convert.ToInt32(data["battle_pet_type"]["id"]);
             type.type = data["battle_pet_type"]["type"].ToString();
             type.name = data["battle_pet_type"]["name"].ToString();
             ability.type = type;
-            ability.rounds = Convert.ToInt32(data["rounds"].ToString());
+
+            ability.rounds = Convert.ToInt32(data["rounds"]);
+
+            ability.media = new PetAbilityMedia();
+            ability.media.id = Convert.ToInt32(data["media"]["id"]);
+            ability.media.assets = this.GetPetAbilityMediaAssetsByPetAbilityId(ability.id);
 
             return ability;
         }
@@ -234,13 +314,13 @@ namespace BlizzardAPI.WoW{
             JObject data = JObject.Parse(response.Content.ReadAsStringAsync().Result);
 
             List<PetAbilityMediaAsset> assets = new List<PetAbilityMediaAsset>();
-
             foreach(JObject _asset in data["assets"].Children()){
                 PetAbilityMediaAsset asset = new PetAbilityMediaAsset();
-                asset.petAbilityId = Convert.ToInt32( data["id"].ToString() );
+                asset.petAbilityId = Convert.ToInt32( data["id"] );
                 asset.key = _asset["key"].ToString();
                 asset.value = _asset["value"].ToString();
-                asset.fileDataId = Convert.ToInt32( _asset["file_data_id"].ToString() );
+                asset.fileDataId = Convert.ToInt32( _asset["file_data_id"] );
+                assets.Add(asset);
             }
 
             return assets;

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace BlizzardAPI.WoW{
+namespace BlizzardAPI{
     public class Locale{
         public string code{get;set;}
         public string region{get;set;}
         public string name{get;set;}
         public string host{get;set;}
+        public string authHost{get;set;}
         public Locale(){
 
         }
@@ -27,6 +28,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "US";
             locale.name = "English (US)";
             locale.host = "https://us.api.blizzard.com/";
+            locale.authHost = "https://us.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -34,6 +36,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "US";
             locale.name = "Espanol (AL)";
             locale.host = "https://us.api.blizzard.com/";
+            locale.authHost = "https://us.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -41,6 +44,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "US";
             locale.name = "Portugues (AL)";
             locale.host = "https://us.api.blizzard.com/";
+            locale.authHost = "https://us.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -48,6 +52,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "English (EU)";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -55,6 +60,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "Espanol (EU)";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -62,6 +68,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "French";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -69,6 +76,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "Russian";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -76,6 +84,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "Deutsch";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -83,6 +92,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "PT?";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -90,6 +100,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "EU";
             locale.name = "Italiano";
             locale.host = "https://eu.api.blizzard.com/";
+            locale.authHost = "https://eu.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -97,6 +108,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "KR";
             locale.name = "Korean";
             locale.host = "https://kr.api.blizzard.com/";
+            locale.authHost = "https://kr.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -104,6 +116,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "TW";
             locale.name = "Taiwanese";
             locale.host = "https://tw.api.blizzard.com/";
+            locale.authHost = "https://tw.battle.net/";
             locales.Add(locale);
 
             locale = new Locale();
@@ -111,6 +124,7 @@ namespace BlizzardAPI.WoW{
             locale.region = "CN";
             locale.name = "Chinese";
             locale.host = "https://gateway.battlenet.com.cn/";
+            locale.authHost = "https://cn.battle.net/";
             locales.Add(locale);
 
             return locales;

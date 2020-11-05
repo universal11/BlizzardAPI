@@ -17,6 +17,7 @@ namespace BlizzardAPI.WoW{
         public string icon{get;set;}
         public Creature creature{get;set;}
         public bool isRandomCreatureDisplay{get;set;}
+        public PetMedia media{get;set;}
 
 
         public Pet(){

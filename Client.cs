@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using BlizzardAPI.WoW;
 using Newtonsoft.Json.Linq;
 
 namespace BlizzardAPI
 {
     public class Client
     {
+        public Locale locale{get;set;}
         public string clientId{get;set;}
         public string secretKey{get;set;}
         public string accessToken{get;set;}
@@ -18,9 +20,7 @@ namespace BlizzardAPI
         private int requestCounter {get;set;} = 0;
         private HttpClient httpClient = new HttpClient();
 
-        //public Locale locale{get;set;}
-
-        /*
+    
         public Client(string clientId, string secretKey, string localeCode){
             this.Init(clientId, secretKey, localeCode);
         }
@@ -30,15 +30,7 @@ namespace BlizzardAPI
             this.secretKey = secretKey;
             this.locale = Locale.GetByCode(localeCode);
         }
-        */
-
-        public Client(){
-            
-        }
-
-        public Client(string clientId, string secretKey){
-            this.Init(clientId, secretKey);
-        }
+        
 
         public void Init(string clientId, string secretKey){
             this.clientId = clientId;
@@ -50,13 +42,17 @@ namespace BlizzardAPI
         }
 
         public string GetAccessToken(){
+            string url = $"{this.locale.authHost}oauth/token";
             Dictionary<string, string> values = new Dictionary<string, string>{
                 { "grant_type", "client_credentials" }
             };
             FormUrlEncodedContent data = new FormUrlEncodedContent(values);
             //HttpClient client = new HttpClient();
             this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{this.clientId}:{this.secretKey}")) );
-            HttpResponseMessage response = this.httpClient.PostAsync("https://us.battle.net/oauth/token", data).Result;
+            if(this.enableDebugMode){
+                System.Console.WriteLine($"POST: {url}");
+            }
+            HttpResponseMessage response = this.httpClient.PostAsync($"{url}", data).Result;
             string accessToken = JObject.Parse(response.Content.ReadAsStringAsync().Result)["access_token"].ToString();
             //client.Dispose();
             return accessToken;
